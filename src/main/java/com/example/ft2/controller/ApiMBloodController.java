@@ -1,7 +1,10 @@
 package com.example.ft2.controller;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,21 +31,22 @@ public class ApiMBloodController {
     @Autowired MBloodRepository mBloodRepository;
 
     @GetMapping("blood")
-    public ResponseEntity<?> getAllBloodGroup(){
-       List<MBlood> listMBlood = this.mBloodRepository.findByIsDelete(false);
-       try{
-           if(listMBlood.isEmpty()){
-            return new ResponseEntity<>("Tidak ada data", HttpStatus.NO_CONTENT);
-           }
-           else {
-            return new ResponseEntity<>(listMBlood, HttpStatus.OK);
-           }
-
-       } catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-       }
-       
+    public ResponseEntity<?> getAllBloodGroup() {
+    List<MBlood> listMBlood = this.mBloodRepository.findByIsDelete(false);
+    try {
+        if (listMBlood.isEmpty()) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK); // Array kosong
+        } else {
+            return new ResponseEntity<>(listMBlood, HttpStatus.OK); // Data ditemukan
+        }
+    } catch (Exception e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Internal server error");
+        response.put("details", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
+
 
     @GetMapping("get/{id}")
     public ResponseEntity<?> getBloodById(@PathVariable("id")Long id){
@@ -113,7 +117,7 @@ public class ApiMBloodController {
         Optional<MBlood> item = this.mBloodRepository.findById(id);
 
         if(item.isPresent()) {
-            MBlood mBlood = new MBlood();
+            MBlood mBlood = item.get();
             mBlood.deleteBy = userId;
             mBlood.deleteOn = new Date();
             mBlood.isDelete = true;
@@ -121,7 +125,8 @@ public class ApiMBloodController {
             return new ResponseEntity<>("Delete success", HttpStatus.OK);
         }
         else {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);        }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);  
+        }
     }
 
 

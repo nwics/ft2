@@ -8,7 +8,215 @@
 <body>
     <div layout:fragment="content">
         <h1>Tampilan Blood</h1>
+        <div class="container">
+            <h1 class="mb-5"><center>Golongan Darah</center></h1>
+            <div class="row">
+                <div class="col-md-3" >
+                    <input class="form-control" type="search" placeholder="Search" oninput="searchBlood(this.value)">
+                </div>
+                <div class="col-md d-flex justify-content-end">
+                    <button onclick="modalNew()" class="btn btn-success mb-3">Create</button>
+                </div>
+            </div>
+
+            <table class="table table-striped w-600px" border="2">
+                <thead class="table-primary text-white">
+                    <tr class="bg-primary">
+                        <th>Code</th>
+                        <th>Deskripsi</th>
+                        <th colspan="2">action</th>
+                    </tr>
+                </thead>
+                <tbody id="isidata"></tbody>
+
+            </table>
+
+        </div>
     </div>
     
 </body>
 </html>
+<script>
+
+var userId= 1;
+    $(function(){
+        fetchData()
+    })
+
+    const fetchData = () => {
+        $.ajax({
+            url:"/api/blood",
+            type:"get",
+            contentType: "application/json",
+            success: function(response){
+                console.log("response:", response)
+                var str = ""
+                for(var i = 0; i<response.length;i++) {
+                    str+= "<tr>"
+                    str+= "<td style='text-align:center;'>"+response[i].code+"</td>"
+                    if(response[i].description == null) {
+                        str+= "<td> - </td>"
+                    }
+                    else {
+                        str+= "<td>"+response[i].description+"</td>"
+                    }
+                    str += "<td style='text-align:center;'><button class='btn btn-warning' value='" + response[i].id + "' onclick='handleEdit(this.value)'>Edit </button></td>";
+                    str += "<td style='text-align:center;'><button class='btn btn-danger' value='" + response[i].id + "' onclick='handleDelete(this.value)'>Delete </button></td>";
+
+                    str += "</tr>"
+                }
+                $('#isidata').html(str)
+            }
+        })
+        
+    }
+    
+
+    const modalNew = () => {
+        var str = "<form>";
+    // str += '<div class="alert alert-danger form-group" role="alert" style="display: none;">';
+    // str += 'Masukkan kode terlebih dahulu!!!';
+    // str += '</div>';
+
+    str += '<div class="form-group">';
+    str += '<label>Kode*</label>';
+    str += '<input type="text" class="form-control" id="code">';
+    str += '</div>';
+
+    str += '<div class="form-group">';
+    str += '<label>Deskripsi</label>';
+    str += '<textarea class="form-control" id="description"></textarea>';
+    str += '</div>';
+    str += "</form>";
+
+    $(".modal-title").html("Tambah Golongan Darah");
+    $(".modal-body").html(str);
+    $('#btnSubmit').html("Simpan");
+    $('#btnSubmit').off("click").on("click",addBlood)
+    $('#modal').modal('toggle');
+    }
+
+    const addBlood = () => {
+        // alert("berhasil di simpan")
+        if($('#code').val() == "") {
+            $('#alert').show()
+        }
+        else {
+            const formdata = {
+                code:$("#code").val(),
+                description:$("#description").val() || null
+            }
+            console.log(formdata)
+            $.ajax({
+                url:"/api/blood/add",
+                type: "post",
+                contentType: "application/json",
+                data : JSON.stringify(formdata),
+                success: function(resAdd) {
+                    if(resAdd == "sudah ada data") {
+                        $('.alert').html("data sudah ada")
+                        $('.alert').show()
+                    }
+                    else {
+                        fetchData()
+                        alert("data tersimpan")
+                        $('#modal').modal('toggle')
+                    }
+                }
+            })
+        }
+    }
+
+    const handleEdit = (id) => {
+        $.ajax({
+            url:"/api/get/"+id,
+            type: "get",
+            contentType: "Application/json",
+            success: function(data){
+                var str = "<form>"
+                    str+= '<div class="alert alert-danger form-group" role="alert" style="display:none;">'
+                    str+= 'Masukkan kode terlebih dahulu'
+                    str+= '</div>'
+
+                    str+= '<div class="form-group">'
+                    str+= '<label>Kode*</label>'
+                    str+= '<input type="text" class="form-control" id="code" value="'+data.code+'" >'
+                    str+= '</div>'
+
+                    str+= '<div class="form-group">'
+                    str+= '<label>Deskripsi</label>'
+                    str+= '<textarea class="form-control" id="description">'+data.description+'</textarea>'
+                    str+= '</div>'
+                    str+= '</form>'
+
+                    $('.modal-title').html('Ubah Golingan darah')
+                    $('.modal-body').html(str)
+                    $('#btnSubmit').html("simpan")
+
+                    $('#btnSubmit').off('click').on('click', function(){
+                        if($('#code').val().trim() === "") {
+                            $(".alert").show();
+                            return;
+                        }
+
+                        const formdata = {
+                            id:id,
+                            code: $("#code").val(),
+                            description: $("#description").val().trim()
+                        }
+
+                        console.log("formdata", formdata)
+
+                        $.ajax({
+                            url:"/api/blood/edit/"+id,
+                            type:"put",
+                            contentType: "application/json",
+                            data: JSON.stringify(formdata),
+                            success: function(resEdit){
+                                if(resEdit ==="Data sudah ada") {
+                                    $(".alert").html("data sudah ada").show()
+                                }
+                                else {
+                                    fetchData()
+                                    $("#modal").modal('toggle')
+                                }
+                            }
+
+                        })
+                    })
+                    $(".modal").modal('toggle')
+            }
+        })
+    }
+
+    const handleDelete = (id) => {
+        $.ajax({
+          url: "/api/get/"+id,
+          type: "get",
+          contentType: "application/json",
+          success: function(data){
+            var str= '<center><h5>Apakah ingin dihapus? '+data.code+'</h5></center>'
+
+            $('.modal-title').html("Hapus Golongan Darah")
+            $('.modal-body').html(str)
+            $('#btnCancel').html("tidak")
+            $('#btnSubmit').html("ya")
+            $("#btnSubmit").off("click").on("click", function(){
+                $.ajax({
+                    url: '/api/blood/delete/'+userId+'/'+id,
+                    type: "put",
+                    contentType: "application/json",
+                    success: function(){
+                        fetchData()
+                        $('#modal').modal('toggle')
+                    }
+                })
+            })  
+            $('alert').hide()
+            $('#modal').modal('toggle')              
+          }  
+        })
+    }
+
+
+</script>
