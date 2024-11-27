@@ -1,3 +1,267 @@
+<!-- <!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragments/layout}">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Menu Blood Group</title>
+        <script src="/js/blood_group.js"></script>
+    </head>
+
+    <body>
+        <div layout:fragment="content">
+            <div class="container">
+                <h1>Golongan Darah</h1>
+                <input type="text" placeholder="Search..." id="searchButton" value="" oninput="SearchButton(this.value)" onchange="SearchButton(this.value)">
+                <button class="btn btn-primary" style="float: right;" onclick="OpenModal()">Tambah</button>
+                <table class="table" border="2">
+                    <thead>
+                        <th>Kode</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+
+</html> -->
+
+<!-- var form = `
+<form id="goldarForm">
+    <div class="form-group">
+        <label>Kode*</label>
+        <input type="text" class="form-control" id="kode" maxlength="5">
+        <div class="text-danger" id="errorKode" style="display: none;"></div>
+    </div>
+    <div class="form-group">
+        <label>Deskripsi</label>
+        <input type="text" class="form-control" id="deskripsi">
+        <div class="text-danger" id="errorDesc" style="display: none;"></div>
+    </div>
+</form>
+`
+
+$(function () {
+    $('.modal-body').html(form)
+    fetchData()
+
+    $('#ourModal').on('hidden.bs.modal', function () {
+        $('.modal-body').html(form)
+        $('#searchButton').val('')
+        fetchData()
+    })
+})
+
+$(document).ready(function () {
+    $('#kode').on('input', function () {
+        $('#errorKode').hide()
+    })
+})
+
+function OpenModal() {
+    $('#goldarForm').trigger('reset')
+    $('#modalTitle').text('TAMBAH GOLONGAN DARAH')
+    $('#btnSubmit').text('Simpan');
+
+    $('#btnSubmit').off('click').on('click', saveGoldar)
+
+    $('#ourModal').modal('show')
+}
+
+function fetchData() {
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype',
+        type: 'get',
+        contentType: 'application/json',
+        success: function (resp) {
+            var str = ""
+            var resp = resp.data
+            for (let i = 0; i < resp.length; i++) {
+                str += "<tr>"
+                str += "<td>" + resp[i].code + "</td>"
+                str += "<td>" + resp[i].description + "</td>"
+                str += "<td><button class='btn btn-primary' value='" + resp[i].id + "' onclick='getBloodType(this.value)'>U</button>"
+                str += "<button class='btn btn-danger' value='" + resp[i].id + "' onclick='deleteModal(this.value)'>H</button></td>"
+                str += "</tr>"
+            }
+            console.log(resp)
+            $('#table-body').html(str)
+        }
+    })
+}
+
+function saveGoldar() {
+    var kode = $('#kode').val()
+    var desc = $('#deskripsi').val()
+
+    var formData = JSON.stringify({
+        "code": kode,
+        "description": desc
+    })
+
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/add',
+        type: 'post',
+        contentType: 'application/json',
+        data: formData,
+        success: function () {
+            $('#ourModal').modal('toggle')
+            fetchData()
+        },
+        error: function (jqXHR) {
+            handleErrors(jqXHR)
+        }
+    })
+}
+
+function getBloodType(id) {
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/' + id,
+        type: 'get',
+        contentType: 'application/json',
+        success: function (resp) {
+            $('#modalTitle').text('UBAH GOLONGAN DARAH')
+
+            var resp = resp.data
+            $('#kode').val(resp.code)
+            $('#deskripsi').val(resp.description)
+
+            $('#btnSubmit').text('Simpan')
+
+            $('#btnSubmit').off('click').on('click', function () {
+                updateGoldar(id)
+            })
+
+            $('#ourModal').modal('show')
+        }, error: function (jqXHR) {
+            handleErrors(jqXHR);
+        }
+    })
+}
+
+function updateGoldar(id) {
+    var id = id
+    var code = $('#kode').val()
+    var desc = $('#deskripsi').val()
+
+    var formData = JSON.stringify({
+        "id": id,
+        "code": code,
+        "description": desc
+    })
+
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/update',
+        type: 'put',
+        contentType: 'application/json',
+        data: formData,
+        success: function () {
+            $('#ourModal').modal('toggle')
+            fetchData()
+        },
+        error: function (jqXHR) {
+            handleErrors(jqXHR)
+        }
+    })
+}
+
+function deleteModal(id) {
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/' + id,
+        type: 'get',
+        contentType: 'application/json',
+        success: function (resp) {
+            var resp = resp.data
+            $('#modalTitle').text('Hapus!')
+
+            str = ""
+            str += "Anda Akan Menghapus Golongan Darah " + resp.code + " ?"
+
+            $('#btnSubmit').text('Ya')
+
+            $('.modal-body').html(str)
+
+            $('#btnSubmit').off('click').on('click', function () {
+                updateDelete(resp.id)
+            })
+
+            $('#ourModal').modal('show')
+        }
+    })
+}
+
+function updateDelete(id) {
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/delete/' + id,
+        type: 'put',
+        contentType: 'application/json',
+        success: function () {
+            $('#ourModal').modal('toggle')
+            fetchData()
+        }
+    })
+}
+
+
+
+function SearchButton(kata) {
+    if (kata === '%') {
+        kata = '%25'
+    } else {
+        kata = encodeURIComponent(kata)
+    }
+
+    console.log(kata)
+    $.ajax({
+        url: 'http://localhost:8080/api/bloodtype/search?search=' + kata,
+        type: 'get',
+        contentType: 'application/json',
+        success: function (resp) {
+            var str = ""
+            var resp = resp.data.hasil_pencarian
+            for (let i = 0; i < resp.length; i++) {
+                str += "<tr>"
+                str += "<td>" + resp[i].code + "</td>"
+                str += "<td>" + resp[i].description + "</td>"
+                str += "<td><button class='btn btn-primary' value='" + resp[i].id + "' onclick='getBloodType(this.value)'>U</button>"
+                str += "<button class='btn btn-danger' value='" + resp[i].id + "' onclick='deleteModal(this.value)'>H</button></td>"
+                str += "</tr>"
+            }
+            $('#table-body').html(str)
+        }, error: function (jqXHR) {
+            handleErrors(jqXHR)
+        }
+    })
+}
+
+
+
+function handleErrors(jqXHR) {
+    if (jqXHR.status === 409) {
+        var response = jqXHR.responseJSON
+        var errors = response.error
+        if (errors.blood_code) {
+            $('#errorKode').text(errors.blood_code).show()
+        }
+    } else if(jqXHR.status === 404) {
+        var str = `
+        <tr>
+            <td colspan=3>Tidak Ada Golongan Darah</td>
+        </tr>
+        `
+        $('#table-body').html(str)
+    }else if(jqXHR.status === 400) {
+        fetchData()
+    }else {
+        alert("An unexpected error occured: " + jqXHR.status + " - " + jqXHR.statusText)
+    }
+
+
+} -->
+
 <!DOCTYPE html>
 <html lang="en" layout:decorate="~{fragments/layout}">
 <head>
