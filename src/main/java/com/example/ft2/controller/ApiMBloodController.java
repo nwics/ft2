@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ft2.model.BloodGroup;
 import com.example.ft2.model.MBlood;
 import com.example.ft2.repository.MBloodRepository;
 
@@ -44,8 +47,26 @@ public class ApiMBloodController {
         response.put("error", "Internal server error");
         response.put("details", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-}
+
+    //  @GetMapping("bloodtype")
+    // public ResponseEntity<ApiResponse<List<BloodGroup>>> getBloodGroup() {
+    //     try {
+    //         List<BloodGroup> listBloodGroup = this.bloodTypeRepository.order();
+    //         if (listBloodGroup.isEmpty()) {
+    //             return ResponseUtil.generateErrorMessage("Golongan Darah Tidak Ditemukan", listBloodGroup,
+    //                     HttpStatus.CONFLICT);
+    //         }
+    //         return ResponseUtil.generateSuccessMessage("Golongan Darah Berhasil Ditemukan", listBloodGroup,
+    //                 HttpStatus.CREATED);
+
+    //     } catch (Exception e) {
+    //         return ResponseUtil.generateErrorMessage("Gagal Mendapatkan Data Golongan Darah", e.getMessage(),
+    //                 HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
 
 
     @GetMapping("get/{id}")
@@ -58,6 +79,36 @@ public class ApiMBloodController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
+
+    // @GetMapping("bloodtype/{id}")
+    // public ResponseEntity<ApiResponse<Optional<BloodGroup>>> getBloodGroup(@PathVariable("id") Long id) {
+    //     try {
+    //         Optional<BloodGroup> bloodData = this.bloodTypeRepository.findById(id);
+    //         if (bloodData.isPresent()) {
+    //             return ResponseUtil.generateSuccessMessage("Berhasil Mendapatkan Data Golongan Darah", bloodData);
+    //         } else {
+    //             return ResponseUtil.generateErrorMessage("Golongan Darah Tidak Ditemukan",
+    //                     "Tidak ada Golongan Darah dengan ID = "
+    //                             + id,
+    //                     HttpStatus.NOT_FOUND);
+    //         }
+    //     } catch (Exception e) {
+    //         return ResponseUtil.generateErrorMessage("Gagal Mendapatkan Data Golongan Darah", e.getMessage(),
+    //                 HttpStatus.INTERNAL_SERVER_ERROR);
+
+    //     }
+    // }
+
+    // public Boolean CheckBloodType(String type) {
+    //     if (type.equalsIgnoreCase("A") || type.equalsIgnoreCase("A-") ||
+    //             type.equalsIgnoreCase("B") || type.equalsIgnoreCase("B-") ||
+    //             type.equalsIgnoreCase("AB") || type.equalsIgnoreCase("AB-") ||
+    //             type.equalsIgnoreCase("O") || type.equalsIgnoreCase("O-")) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     @PostMapping("blood/add")
     public ResponseEntity<?> saveBlood(@RequestBody MBlood mBlood) {
@@ -79,6 +130,42 @@ public class ApiMBloodController {
         }
         
     }
+
+    // @PostMapping("bloodtype/add")
+    // public ResponseEntity<ApiResponse<BloodGroup>> addBloodType(@RequestBody BloodGroup bloodType) {
+    //     try {
+    //         String kode = bloodType.getCode();
+    //         Boolean kodeExist = this.bloodTypeRepository.existsByCode(bloodType.getCode());
+
+    //         Map<String, String> errors = new HashMap<>();
+
+    //         if (kode.isBlank()) {
+    //             errors.put("blood_code", "Kode Kosong.");
+    //         }
+
+    //         if (CheckBloodType(kode) == false && !kode.isBlank()) {
+    //             errors.put("blood_code", "Kode " + kode + " bukan kode Golongan Darah yang ada.");
+    //         }
+
+    //         if (kodeExist) {
+    //             errors.put("blood_code", kode + " Sudah Ada.");
+    //         }
+
+    //         if (!errors.isEmpty()) {
+    //             return ResponseUtil.generateErrorMessage("Validasi Error", errors, HttpStatus.CONFLICT);
+    //         }
+
+    //         bloodType.setCreatedBy(1L);
+    //         bloodType.setCreatedOn(new Date());
+
+    //         BloodGroup saveBloodType = this.bloodTypeRepository.save(bloodType);
+    //         return ResponseUtil.generateSuccessMessage("Golongan Darah Berhasil Disimpan", saveBloodType,
+    //                 HttpStatus.CREATED);
+    //     } catch (Exception e) {
+    //         return ResponseUtil.generateErrorMessage("Golongan Darah Gagal Disimpan", e.getMessage(),
+    //                 HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     @PutMapping("blood/edit/{userId}")
     public ResponseEntity<?>ediBlood(@RequestBody MBlood mBlood, @PathVariable("userId")Long userId){
@@ -112,6 +199,54 @@ public class ApiMBloodController {
 
     }
 
+    // @PutMapping("bloodtype/update")
+    // public ResponseEntity<ApiResponse<BloodGroup>> updateBloodType(
+    //         @RequestBody BloodGroup bloodType) {
+    //     try {
+    //         Map<String, String> errors = new HashMap<>();
+    //         String kode = bloodType.getCode();
+
+    //         if (kode.isBlank()) {
+    //             errors.put("blood_code", "Kode Kosong.");
+    //             return ResponseUtil.generateErrorMessage("Validasi Error", errors, HttpStatus.CONFLICT);
+    //         }
+
+    //         if (!this.bloodTypeRepository.existsByCode(bloodType.getCode())) {
+    //             return ResponseUtil.generateErrorMessage("Gagal Merubah Data Golongan Darah",
+    //                     "Golongan Darah dengan kode : " + bloodType.getCode() + " Tidak Ditemukan",
+    //                     HttpStatus.NOT_FOUND);
+    //         }
+
+    //         Boolean kodeExist = this.bloodTypeRepository.existsByCode(kode, bloodType.getId());
+
+    //         Optional<BloodGroup> bloodTypeData = this.bloodTypeRepository.findById(bloodType.getId());
+
+
+    //         if (CheckBloodType(kode) == false && !kode.isBlank()) {
+    //             errors.put("blood_code", "Kode " + kode + " merupakan kode Golongan Darah yang tidak ada");
+    //         }
+
+    //         if (kodeExist) {
+    //             errors.put("blood_code", kode + " sudah ada.");
+    //         }
+
+    //         if (!errors.isEmpty()) {
+    //             return ResponseUtil.generateErrorMessage("Validasi Error", errors, HttpStatus.CONFLICT);
+    //         }
+
+    //         bloodType.setCreatedBy(bloodTypeData.get().getCreatedBy());
+    //         bloodType.setCreatedOn(bloodTypeData.get().getCreatedOn());
+    //         bloodType.setModifiedBy(2L);
+    //         bloodType.setModifiedOn(new Date());
+    //         BloodGroup updatedData = this.bloodTypeRepository.save(bloodType);
+    //         return ResponseUtil.generateSuccessMessage("Golongan Darah Berhasil Diubah", updatedData,
+    //                 HttpStatus.CREATED);
+    //     } catch (Exception e) {
+    //         return ResponseUtil.generateErrorMessage("Golongan Darah Gagal Diubah", e.getMessage(),
+    //                 HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
     @PutMapping("blood/delete/{userId}/{id}")
     public ResponseEntity<?> deleteBlood(@PathVariable("userId")Long userId, @PathVariable("id")Long id){
         Optional<MBlood> item = this.mBloodRepository.findById(id);
@@ -128,7 +263,72 @@ public class ApiMBloodController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);  
         }
     }
+    // @PutMapping("bloodtype/delete/{id}")
+    // public ResponseEntity<ApiResponse<BloodGroup>> deleteBloodType(@PathVariable("id") Long id) {
+    //     try {
+    //         // Mencari data berdasarkan ID
+    //         Optional<BloodGroup> bloodData = this.bloodTypeRepository.findById(id);
+    
+    //         // Jika data tidak ditemukan
+    //         if (bloodData.isEmpty()) {
+    //             return ResponseUtil.generateErrorMessage(
+    //                 "Gagal Menghapus Golongan Darah",
+    //                 "Golongan Darah dengan ID: " + id + " Tidak Ditemukan",
+    //                 HttpStatus.NOT_FOUND
+    //             );
+    //         }
+    
+    //         // Validasi jika data sudah dihapus
+    //         BloodGroup bloodType = bloodData.get();
+    //         if (Boolean.TRUE.equals(bloodType.getIsDelete())) {
+    //             return ResponseUtil.generateErrorMessage(
+    //                 "Gagal Menghapus Golongan Darah",
+    //                 "Golongan Darah dengan ID: " + id + " Sudah Dihapus",
+    //                 HttpStatus.BAD_REQUEST
+    //             );
+    //         }
+    
+    //         // Menandai data sebagai dihapus
+    //         bloodType.setIsDelete(true);
+    //         bloodType.setDeletedBy(1L); // Sesuaikan ID pengguna yang melakukan penghapusan
+    //         bloodType.setDeletedOn(new Date());
+    //         BloodGroup deletedBloodType = this.bloodTypeRepository.save(bloodType);
+    
+    //         // Mengembalikan respons sukses
+    //         return ResponseUtil.generateSuccessMessage(
+    //             "Golongan Darah Berhasil Dihapus",
+    //             deletedBloodType
+    //         );
+    //     } catch (Exception e) {
+    //         // Menangani error tidak terduga
+    //         return ResponseUtil.generateErrorMessage(
+    //             "Gagal Menghapus Golongan Darah",
+    //             e.getMessage(),
+    //             HttpStatus.INTERNAL_SERVER_ERROR
+    //         );
+    //     }
+    // }
 
+    // @GetMapping("bloodtype/search")
+    // public ResponseEntity<ApiResponse<Map<String, Object>>> searchEngine(@RequestParam String search) {
+    //     try {
+    //         Map<String, Object> stringMap = new HashMap<>();
+    //         System.out.println("-----------------------");
+    //         System.out.println(search);
+    //         stringMap.put("pencarian", search);
 
+    //         List<BloodGroup> hasilPencarian = this.bloodTypeRepository.searching(search);
+    //         if (hasilPencarian.isEmpty() || search.contains("%")) {
+    //             return ResponseUtil.generateErrorMessage("Golongan Darah Tidak Ditemukan", stringMap,
+    //                     HttpStatus.NOT_FOUND);
+    //         }
+    //         stringMap.put("hasil_pencarian", hasilPencarian);
+
+    //         return ResponseUtil.generateSuccessMessage("Golongan Darah Berhasil Ditemukan", stringMap);
+    //     } catch (Exception e) {
+    //         return ResponseUtil.generateErrorMessage("Golongan Darah Gagal Ditemukan", e.getMessage(),
+    //                 HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
 }

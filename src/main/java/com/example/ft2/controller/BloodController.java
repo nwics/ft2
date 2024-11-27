@@ -13,3 +13,13 @@ public class BloodController {
         return "blood/indexapi";
     }
 }
+// @Controller
+// @RequestMapping("/admin/")
+// public class AdminController {
+
+//     @GetMapping("bloodgroup")
+//     public String getBloodGroup() {
+//         return "/blood_group/blood_group.html";
+//     }
+    
+// }
