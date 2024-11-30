@@ -4,16 +4,19 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import groovy.transform.Generated;
+// import groovy.transform.Generated;
 // import groovyjarjarantlr4.v4.parse.ANTLRParser.prequelConstruct_return;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 // import java.lang.annotation.Inherited;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "blood_group")
 public class BloodGroup {
 
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{fragments/layout}">
+
+<head>
+	<title>Cari Dokter</title>
+	<!-- <script src="/js/landingPage.js"></script> -->
+    <script src="/js/jquery.js"></script>
+	<script src="/js/cariDokter.js"></script>
+	<!-- <script src="/js/getDokter.js"></script> -->
+    <script src="/js/getDokter.js"></script>
+    <script src="/js/tekanTombol.js"></script>
+	<style>
+		th {
+			color: white;
+
+		}
+	</style>
+</head>
+
+<body>
+	<div layout:fragment="content">
+		<ol class="bg-primary" style="height:40px;">
+			<div class="row" style="padding-top: 8px;">
+				<a class="text-white">Beranda</a>
+				<p class="text-white active pl-1">/ Cari Doktor</p>
+			</div>
+		</ol>
+		<div class="row" id="topBar">
+        </div>
+		<div class="col-12">
+            <div class="row" id="isidata">
+                
+            </div>
+			<div id="getHalaman">
+            </div>
+		</div>
+        <div>
+            <button onclick="tekanTombol()">Tekan</button>
+        </div>
+	</div>
+</body>
+
+</html>
+
