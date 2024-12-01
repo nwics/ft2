@@ -12,7 +12,7 @@ var flag = 0
 $(function() {
 	fetchDokter(localStorage.getItem("lokasiId"), localStorage.getItem("nameDokter"), localStorage.getItem("nameTindakan"), localStorage.getItem("idSpesialis"))
 	topBar()
-	console.log(localStorage.getItem("namaLokasi"), ",", dokter, ",", tindakan, ",", spesialis)
+	console.log(localStorage.getItem("namaLokasi"), ",", "dokter :",dokter, ",", "tindakan : ",tindakan, ",","spesialis : ", spesialis)
     // console.log()
 })
 var halaman = 0
@@ -73,7 +73,7 @@ function getlokasi(dokterId, nomor) {
 				var menitAwal = Number((dataSchedule.data[i].mMedicalFacilitySchedule.timeScheduleStart).substring(3, 5))
 				var jamAkhir = Number((dataSchedule.data[i].mMedicalFacilitySchedule.timeScheduleEnd).substring(0, 2))
 				var menitAkhir = Number((dataSchedule.data[i].mMedicalFacilitySchedule.timeScheduleEnd).substring(3, 5))
-				console.log(jamAwal, menitAwal, jamAkhir, menitAkhir)
+				console.log("jam awal:",jamAwal, "menit awal:",menitAwal,"jam akhir:" ,jamAkhir,"menit akhir:", menitAkhir)
 				if (dataSchedule.data[i].mMedicalFacilitySchedule.day === hari) {
 					if (jam >= jamAwal && jam <= jamAkhir) {
 						if (menit <= menitAkhir) {
@@ -90,7 +90,7 @@ function getlokasi(dokterId, nomor) {
 					data += 1
 					lokasi += '<p class="ml-2 mb-3" style="font-size: small;"><img src="/svg/hospital.svg" alt="hospital SVG" width="30px" height="30px" class="text-warning mr-2"/> ' + dataSchedule.data[i].mMedicalFacilitySchedule.mMedicalFacility.name + ' ( ' + dataSchedule.data[i].mMedicalFacilitySchedule.mMedicalFacility.mLocation.name + ' , ' + dataSchedule.data[i].mMedicalFacilitySchedule.mMedicalFacility.mLocation.mLocation.name + ' )</p>'
 				}
-				console.log(dataSchedule.data[i].mDoctor.mBiodata.name, flag, count)
+				console.log("data schedule: ",dataSchedule.data[i].mDoctor.mBiodata.name, flag, count)
 
 
 			}
@@ -168,12 +168,13 @@ function getPengalaman(dokterId, nomor) {
 
 function fetchDokter(lok, fullname, tndkn, spsls) {
 	lokasi = lok
-	console.log(lokasi)
+	console.log("lokasi: ",lokasi)
 	$.ajax({
 		url: `/doctor/pagingsearch?namaDokter=${fullname}&idSpesialis=${spsls}&namaTindakan=${tndkn}&lokasiId=${lok}`,
 		type: 'get',
 		contentType: 'application/json',
 		success: function(dataDoctor) {
+            console.log("data doctor1: ", dataDoctor)
 			dokter = fullname
 			tindakan = tndkn
 			spesialis = spsls
@@ -231,6 +232,7 @@ function fetchDokterPaging(page, perPage) {
 			type: 'get',
 			contentType: 'application/json',
 			success: function(dataDoctor) {
+                console.log("Data doctor2 : ", dataDoctor)
 				halaman = dataDoctor.page
 				halamanPerLembar = dataDoctor.perPage
 				var str = ""

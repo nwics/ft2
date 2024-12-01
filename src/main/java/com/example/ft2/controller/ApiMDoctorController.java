@@ -1,6 +1,7 @@
 package com.example.ft2.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,58 @@ public class ApiMDoctorController {
     // @AutowiredMDoctorRepository mDoctorRepository;
     @Autowired MDoctorRepository mDoctorRepository;
 
+    // cek data
+    @GetMapping("search")
+    public ResponseEntity<?> searchDoctors(@RequestParam(required = false, defaultValue = "") String name,
+    @RequestParam(required = false) Long namaSpesialis,
+    @RequestParam(required = false) String namaTindakan,
+    @RequestParam(required = false) Long lokasiID,
+    @RequestParam(defaultValue = "10") Long limit,
+    @RequestParam(defaultValue = "0") Long offset){
+        List<?> results = this.mDoctorRepository.findBySearchWithLokasi(name, namaSpesialis, namaTindakan, lokasiID, limit, offset);
+        // return ResponseEntity.ok(results);
+    List<Object> modifiedResults = new ArrayList<>(results);
+    // Object temporaryObject = Arrays.asList(
+    //     99, // ID sementara
+    //     "Dr. Temporary", // Nama dokter
+    //     "General Medicine", // Spesialisasi
+    //     "Health Checkup", // Tindakan
+    //     "Temporary Clinic", // Nama fasilitas medis
+    //     "Jakarta", // Lokasi
+    //     0, // Parent ID
+    //     0, // Pengalaman (contoh: tahun)
+    //     "Temporary Facility", // Kategori fasilitas
+    //     "/images/doctors/temporary.jpg", // Path gambar
+    //     "Friday", // Jadwal
+    //     11, // Lokasi ID
+    //     5, // ID Spesialisasi
+    //     7  // ID Tindakan
+    // );
+    Object temporaryObject = Arrays.asList(
+        Arrays.asList(4, "Dr. Alex Johnson", "Pediatrics", "Heart Checkup", "RS Heart Center", "Jakarta", 1, 5, "Hospital", "/images/doctors/alex_johnson.jpg", "Monday", 4, 1, 1),
+        Arrays.asList(5, "Dr. Lisa Brown", "Pediatrics", "Vaccination", "Klinik Anak Sehat", "Surabaya", 2, 3, "Clinic", "/images/doctors/lisa_brown.jpg", "Tuesday", 6, 3, 3),
+        Arrays.asList(6, "Dr. Mark Spencer", "Orthopedics", "Bone Surgery", "RS Ortopedi", "Bandung", 3, 7, "Hospital", "/images/doctors/mark_spencer.jpg", "Wednesday", 6, 3, 3),
+        Arrays.asList(7, "Dr. Emily White", "Dermatology", "Skin Treatment", "Klinik Kulit Cantik", "Yogyakarta", 4, 4, "Clinic", "/images/doctors/emily_white.jpg", "Thursday", 8, 4, 4),
+        Arrays.asList(8, "Dr. Daniel Green", "Neurology", "Brain Examination", "RS Otak Cerdas", "Medan", 5, 6, "Hospital", "/images/doctors/daniel_green.jpg", "Friday", 4, 1, 1),
+        Arrays.asList(9, "Dr. Sophia Turner", "Pediatrics", "Eye Checkup", "Klinik Mata Sehat", "Semarang", 6, 2, "Clinic", "/images/doctors/sophia_turner.jpg", "Saturday", 4, 1, 2),
+        Arrays.asList(10, "Dr. Michael Evans", "Pediatrics", "Lung Treatment", "RS Paru Sehat", "Malang", 7, 8, "Hospital", "/images/doctors/michael_evans.jpg", "Sunday", 4, 2, 3),
+        Arrays.asList(11, "Dr. Olivia Scott", "Cardiology", "Diabetes Treatment", "Klinik Hormonal", "Palembang", 8, 3, "Clinic", "/images/doctors/olivia_scott.jpg", "Monday", 2, 2, 2),
+        Arrays.asList(12, "Dr. William Brown", "Orthopedics", "Stomach Examination", "RS Pencernaan", "Bogor", 9, 4, "Hospital", "/images/doctors/william_brown.jpg", "Tuesday", 6, 2, 3)
+    );
+    modifiedResults.add(temporaryObject);
+    return ResponseEntity.ok(modifiedResults);
+    
+
+    // results.add(new{
+    //     4,"Dr. Michael Brown","Neurology","Brain Surgery","RS Cipto Mangunkusumo","Jakarta",3,0,"Hospital","/images/doctors/michael_brown.jpg","Thursday",5,2,2 
+    // });
+    }
+    
+    @GetMapping("all")
+    public ResponseEntity<List<MDoctor>> getAllDoctors(){
+        List<MDoctor> doctors = mDoctorRepository.findByIsDelete();
+        return ResponseEntity.ok(doctors);
+    }
 	// Response-----------------------------------------------------------------------------------------------------------
 	private Map<String, Object> response(String status, String message, Object data, Object schedule) {
 
